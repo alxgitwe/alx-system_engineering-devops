@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# hours: 0-12 - minutes 1-59
+
+x=0
+while [ "$x" -le 12 ]
+do
+    echo "Hour: $x"
+    (( x++ ))
+
+    y=1
+    while [ "$y" -le 59 ]
+    do
+	echo "$y"
+	(( y++ ))
+    done
+done
