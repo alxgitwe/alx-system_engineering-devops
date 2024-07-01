@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# script ssh connect server
+
+ssh -i ~/.ssh/school 4101ee5073c4@4101ee5073c4.d64a334f.alx-cod.online
