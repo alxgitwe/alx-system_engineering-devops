@@ -1,5 +1,2 @@
 #!/usr/bin/env bash
-sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get -y install apache2
-sudo service apache2 start
+/etc/init.d/apache2 restart
