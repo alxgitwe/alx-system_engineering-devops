@@ -1,26 +1,31 @@
-# Utilize Puppet to streamline the process of generating a personalized HTTP header response
+# Use Puppet to automate the task of creating a custom HTTP header response
+
+# Define the package name and service name
+$package_name = 'nginx'
+$service_name = 'nginx'
 
 # Update the package list
-Exec {'refresh':
+exec {'update':
   command => '/usr/bin/apt-get update',
 }
 
-# Ensure Nginx is installed
-Package {'nginx':
-  ensure => 'installed',
-  require => Exec['refresh'],
+# Ensure the package is installed
+package {$package_name:
+  ensure => 'present',
+  require => Exec['update'],
 }
 
-# Add a custom HTTP header to the Nginx configuration file
-File_line {'custom_http_header':
-  path  => '/etc/nginx/nginx.conf',
+# Add a custom HTTP header to the configuration file
+file_line {'http_header':
+  path  => "/etc/${package_name}/${package_name}.conf",
   match => 'http {',
   line  => "http {\n\tadd_header X-Served-By \"${hostname}\";",
-  require => Package['nginx'],
+  require => Package[$package_name],
 }
 
-# Restart Nginx to apply the changes
-Exec {'restart':
-  command => '/usr/sbin/service nginx reload',
-  require => [Package['nginx'], File_line['custom_http_header']],
+# Restart the service to apply the changes
+exec {'run':
+  command => "/usr/sbin/service ${service_name} restart",
+  require => File_line['http_header'],
 }
+
