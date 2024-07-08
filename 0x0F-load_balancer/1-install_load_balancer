@@ -1,33 +1,28 @@
 #!/usr/bin/env bash
-
-# Define variables for server names and IP addresses
-WEB_SERVER_1="63210-web-01"
-WEB_SERVER_1_IP="54.196.201.51"
-WEB_SERVER_2="63210-web-02"
-WEB_SERVER_2_IP="54.237.73.120"
-
-# Update package list and install HAProxy
+# Create a script to install and configure HAProxy on lb-01 server
+# Configure HAProxy to send traffic to web-01 and web-02 servers
+# Distribute requests using a roundrobin algorithm
+# Make sure that HAProxy can be managed via an init script
+# Install and configure HAproxy on my lb-01 server.
 sudo apt-get -y update
-sudo apt-get -y install haproxy
+apt-get -y install haproxy
 
-# Define the HAProxy configuration
-server_config="
+# edit config file
+server_config=\
+"
 frontend  yonas-frontend
         bind *:80
         mode http
         default_backend yonas-backend
 backend yonas-backend
         balance roundrobin
-        server 63210-web-01 54.196.201.51:80 check
-        server 63210-web-02 54.237.73.120:80 check
+        server 63210-web-01 100.25.19.204:80 check
+        server 63210-web-02 54.157.159.85:80 check
 "
-
-# Append the configuration to the HAProxy configuration file
 echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-# Enable HAProxy to be started by init script
+# enable haproxy to be started by init script
+
 echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-# Restart HAProxy to apply the changes
 sudo service haproxy restart
-
