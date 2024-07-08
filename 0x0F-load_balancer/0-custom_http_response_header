@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Page redirection script
+
+# Update the system packages
+sudo apt update
+
+# Install nginx
+sudo apt-get -y install nginx
+
+# Allow Nginx HTTP through the firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Create the necessary directories
+sudo mkdir -p /var/www/html
+
+# Change ownership of the directories
+sudo chown -R "$USER":"$USER" /var/www/html
+
+# Create an index.html file with a simple message
+echo "Hello World!" > /var/www/html/index.html
+
+# Create an error page
+echo "This is not a page" > /var/www/html/error404.html
+
+# Configure the server
+echo "
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        add_header X-Served-By $HOSTNAME;
+ 
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+ 
+        error_page 404 /error404.html;
+        location = /error404.html {
+                root /var/www/html;
+                internal;
+        }
+ 
+        location /redirect_me {
+return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+  }
+ 
+}" | sudo tee /etc/nginx/sites-available/default
+
+# Restart the nginx service
+sudo service nginx restart
+
