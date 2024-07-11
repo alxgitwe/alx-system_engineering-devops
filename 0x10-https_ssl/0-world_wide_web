@@ -1,30 +1,17 @@
 #!/usr/bin/env bash
 # Function to display information about a subdomain
 
-get_record() {
-  local domain="$1" subdomain="$2"
-  record_type=$(dig "$subdomain.$domain" +short AAAA A MX | awk '{print $1}')
-  if [[ -n "$record_type" ]]; then
-    destination=$(dig "$subdomain.$domain" +short AAAA A MX | awk '{print $NF}')
-    echo "The subdomain $subdomain is a $record_type record and points to $destination"
-  fi
+function ddd () {
+    if [ "$2" ]
+    then
+        dig $2.$1 | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ printf "The subdomain %s is a %s record and points to %s\n", subd, $4, $5 }' subd=$2
+    elif [ "$1" ]
+    then
+        ddd "$1" "www"
+        ddd "$1" "lb-01"
+        ddd "$1" "web-01"
+        ddd "$1" "web-02"
+    fi
 }
 
-# Validate domain argument
-if [[ -z "$1" ]]; then
-  echo "Error: Please provide a domain name."
-  exit 1
-fi
-
-domain="$1"
-subdomain="$2"
-
-# Check for specific subdomain or all defined ones
-if [[ -z "$subdomain" ]]; then
-  get_record "$domain" "www"
-  get_record "$domain" "lb-01"
-  get_record "$domain" "web-01"
-  get_record "$domain" "web-02"
-else
-  get_record "$domain" "$subdomain"
-fi
+ddd $1 $2
