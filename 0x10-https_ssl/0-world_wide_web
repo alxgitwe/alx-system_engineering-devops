@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
 # script
 
-get_subdomain_info() {
-    domain=\$1
-    subdomain=\$2
-
-    if [ -z "$subdomain" ]; then
-        subdomains=("www" "lb-01" "web-01" "web-02")
-    else
-        subdomains=("$subdomain")
+function ddd () {
+    if [ "$2" ]
+    then
+        dig $2.$1 | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ printf "The subdomain %s is a %s record and points to %s\n", subd, $4, $5 }' subd=$2
+    elif [ "$1" ]
+    then
+        ddd "$1" "www"
+        ddd "$1" "lb-01"
+        ddd "$1" "web-01"
+        ddd "$1" "web-02"
     fi
-
-    for sub in "${subdomains[@]}"; do
-        result=$(dig $sub.$domain | grep -A1 'ANSWER SECTION:')
-        record_type=$(echo $result | awk '{print \$4}')
-        destination=$(echo $result | awk '{print \$5}')
-        echo "The subdomain $sub is a $record_type record and points to $destination"
-    done
 }
 
-get_subdomain_info \$1 \$2
+ddd $1 $2
