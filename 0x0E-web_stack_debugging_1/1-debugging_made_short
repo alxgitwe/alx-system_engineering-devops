@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-service nginx start
+service nginx status || service nginx start
+echo "Nginx status after fix:"
 service nginx status
