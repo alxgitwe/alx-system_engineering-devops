@@ -1,24 +1,17 @@
 #!/usr/bin/env bash
 # script
 
-domain="$1"
-subdomains=("www" "lb-01" "web-01" "web-02")
-
-# Function using process substitution and parameter expansion
-get_record() {
-  local subdomain="$1"
-  record_type=$(dig "$subdomain.$domain" +short AAAA A MX | head -n 1 | awk '{print $1}')
-  if [[ -n "$record_type" ]]; then
-    destination=$(dig "$subdomain.$domain" +short AAAA A MX | tail -n 1 | awk '{print $NF}')
-    echo "The subdomain $subdomain is a $record_type record and points to $destination"
-  fi
+display_info ()
+{
+    domain="$1"
+    subdomain="$2"
+    dig "$subdomain.$domain" | awk '/ANSWER SECTION:/{getline; printf "The subdomain %s is a %s record and points to %s\n", var, $4, $5}' var="$subdomain"
 }
 
-# Check for specific subdomain or all defined ones
-if [[ -z "$2" ]]; then
-  for subdomain in "${subdomains[@]}"; do
-    get_record "$subdomain"
-  done
-else
-  get_record "$2"
-fi
+for subdomain in "www" "lb-01" "web-01" "web-02"
+do
+    if [ -z "$2" ] || [ "$2" == "$subdomain" ] ;
+    then
+	display_info "$1" "$subdomain"
+    fi
+done
