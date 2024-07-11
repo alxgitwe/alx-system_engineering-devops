@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Function to display information about a subdomain
+
+display_info() {
+    domain=$1
+    subdomain=$2
+
+    if [ -z "$subdomain" ]; then
+        # Display information for all subdomains if no subdomain is specified
+        echo "The subdomain www is a A record and points to $(dig +short $domain www)"
+        echo "The subdomain lb-01 is a A record and points to $(dig +short $domain lb-01)"
+        echo "The subdomain web-01 is a A record and points to $(dig +short $domain web-01)"
+        echo "The subdomain web-02 is a A record and points to $(dig +short $domain web-02)"
+    else
+        # Display information for the specified subdomain
+        echo "The subdomain $subdomain is a A record and points to $(dig +short $domain $subdomain)"
+    fi
+}
+
+# Check if the domain and subdomain arguments are provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <domain> [<subdomain>]"
+    exit 1
+fi
+
+# Call the function to display information
+display_info "$1" "$2"
