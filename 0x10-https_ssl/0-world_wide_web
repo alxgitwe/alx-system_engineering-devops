@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
-# Function to display information about a subdomain
+# script
 
-function ddd () {
-    if [ "$2" ]
-    then
-        dig $2.$1 | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ printf "The subdomain %s is a %s record and points to %s\n", subd, $4, $5 }' subd=$2
-    elif [ "$1" ]
-    then
-        ddd "$1" "www"
-        ddd "$1" "lb-01"
-        ddd "$1" "web-01"
-        ddd "$1" "web-02"
-    fi
+domain="$1"
+subdomains=("www" "lb-01" "web-01" "web-02")
+
+# Function using process substitution and parameter expansion
+get_record() {
+  local subdomain="$1"
+  record_type=$(dig "$subdomain.$domain" +short AAAA A MX | head -n 1 | awk '{print $1}')
+  if [[ -n "$record_type" ]]; then
+    destination=$(dig "$subdomain.$domain" +short AAAA A MX | tail -n 1 | awk '{print $NF}')
+    echo "The subdomain $subdomain is a $record_type record and points to $destination"
+  fi
 }
 
-ddd $1 $2
+# Check for specific subdomain or all defined ones
+if [[ -z "$2" ]]; then
+  for subdomain in "${subdomains[@]}"; do
+    get_record "$subdomain"
+  done
+else
+  get_record "$2"
+fi
