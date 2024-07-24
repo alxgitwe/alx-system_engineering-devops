@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # script
-
 pkill -f apache2
 chmod 644 /etc/nginx/nginx.conf
 sed -Ei 's/\s*#?\s*user .*/user nginx;/' /etc/nginx/nginx.conf
